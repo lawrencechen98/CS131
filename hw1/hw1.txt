@@ -1,0 +1,41 @@
+For OCaml syntax and pattern matching, I referenced the Real World OCaml online resource:
+https://v1.realworldocaml.org/v1/en/html/lists-and-patterns.html
+
+1. subset 
+	Naturally, the need to iterate the list led me to approach the problem recursively.
+	I recursively called the function to check if all elements in a is a member of b.
+	To decide if the parameters are of base case or not, I used pattern matching.
+
+	I was considering using the built in functions in the List module, such as
+	forall and exist and filters. However, on Piazza, an instructor recommended
+	practicing using pattern matching instead. This is true for all remaining 
+	functions that were similarly implemented.
+
+2. equal_sets
+	I recalled from my math courses that two sets are equal if and only if they are 
+	subsets of each other. Therefore, simply using the subset function twice yielded 
+	the correct answer.
+
+3. set_union
+	I used recursion and pattern matching, like for subset, because essentially the 
+	union of two sets is iterating through the elements of the first set a, and 
+	adding anything not in set b to it. 
+
+4. set_intersection
+	I used the same idea as set_union to implement this function.
+
+5. set_diff
+	I used the same idea as set_union to implement this function.
+
+6. computed_fix_point
+	As suggested in the spec, we want to evaluate x, then f(x), then f(f(x)), etc. until
+	we find the value x in which f(x) = x. This implies that a simple implementation 
+	would be to use recursion to call f repeatedly. 
+
+7. filter_reachable
+	I approached the problem by treating it as a search problem, utilizing some sort
+	of "brute force" search, i.e. starting from the start symbol, iterate and find all 
+	next reachable symbols. We can continue to expand our search in the pool of nonterminal 
+	symbols by evaluating the rules using our "visited" symbol set. Conveniently, we have 
+	the computed_fix_point function we wrote, which helps us know when no new symbols can 
+	be visited using equal_sets.

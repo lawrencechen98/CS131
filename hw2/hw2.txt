@@ -1,0 +1,68 @@
+I decided to write make_parser by using the same helper function as the one
+used in make_matcher, because I noticed that the logic is really similar. 
+make_matcher calles matcher, which is a generic matcher maker, which also 
+calls the helper functions match_per_rhs and match_per_rule. These helper 
+functions recursively call each other, and are inspired by Professor Eggerts
+code from class, i.e. the one derived from an old homework. match_per_rhs is
+essentially make_or_match (only has to match one of the possible rhs) and
+match_per_rule is make_and_match (has to match all symbols in the rule). 
+
+Both make_parser and make_matcher will generate a matcher/parser that is 
+supposed to traverse the grammar and build a parse tree in the same order. 
+Therefore, I decided to utilize the same generic helper function matcher, but 
+simply extend the functionality to account for building parse trees. After 
+experimenting, I realized the easiest way to avoid duplicate code is to make a 
+wrapper around the acceptor functions being passed around. Therefore, at each 
+step, my matcher can simply call the acceptor with both the current derivation 
+and the remaining fragment. By doing so, the recursive calls will ultimately 
+call the acceptor and return the entire derivation as a parse tree. To make 
+sure that make_matcher's functionality is not changed or compromised, I simply
+ignored the derivation output of my helper functions, and only worked and
+interacted with the second part of the tuple, namely the suffix. 
+
+Like the name of the project suggests, this is a naive parser, meaning there
+are certain assumptions being made about our grammar that our parser can parse.
+Therefore, an example weakness would be grammars that may result in infinite
+loops or derivation, thus causing our parser to never finish. This can be 
+caused by certain orderings of the rules. For example, since we are deriving
+the parse tree in order of the rules from left to right, the left derivation
+could cause a infitinie loop due to depth first search / traversal.
+An example grammar that might cause an infinite loop would be:
+
+# type infinite_nonterminals =
+	| A | B ;;
+
+# let infinite_grammar =
+	A,
+	function
+    	| A ->
+        	[[N A; N B];
+        	 [N B]]
+        | B -> [[T"end"]];;
+
+# let frag = ["END"];;
+
+# make_parser infinite_grammar frag;;
+Stack overflow during evaluation (looping recursion?).
+
+Which would hit a looping recursion.
+
+But if you switch the order to:
+
+# let finite_grammar =
+	A,
+	function
+    	| A ->
+        	[[N B];
+        	 [N A; N B]]
+        | B -> [[T"end"]];;
+
+# make_parser finite_grammar frag;;
+(infinite_nonterminals, string) parse_tree option =
+Some (Node (A, [Node (B, [Leaf "end"])]))     
+
+These two rules describe the same grammar, but one hits an infinite loop with
+our order of derivation, while the other concludes.
+
+This would be one of the main weaknesses of this naive parser.
+

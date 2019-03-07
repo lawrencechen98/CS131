@@ -1,0 +1,17 @@
+The speedup ratio calculated by the speedup predicate was about 55.0.
+
+It was calculated by running both the tower and plain_tower predicates on the following test case:
+
+tower(5, T, counts([T1, T2, T3, 3, T5], [B1, B2, 4, B4, 1], [2, L2, L3, L4, 2], [3, 2, R3, 2, R5]))
+
+This is a hard 5x5 puzzle, which helps illustrate the advantage that FD solver has in speeding up the query. For more trivial queries, such as a fully bound C or a fully bound T, my plain_tower rivals the speed of tower, so the speedup ratio isn't clear/significant, hovering around 1.0. The above puzzle was specifically chosen as a test case to demonstrate the speedup.
+
+
+
+An ambiguous 5x5 puzzle found using the ambiguous predicate was the following:
+
+| ?- ambiguous(5, C, T1, T2).
+
+C = counts([4,2,3,2,1],[1,3,2,3,2],[5,3,2,3,1],[1,2,3,2,2])
+T1 = [[1,2,3,4,5],[2,1,4,5,3],[4,5,2,3,1],[3,4,5,1,2],[5,3,1,2,4]]
+T2 = [[1,2,3,4,5],[3,1,4,5,2],[4,5,2,3,1],[2,4,5,1,3],[5,3,1,2,4]]

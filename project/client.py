@@ -1,4 +1,4 @@
-from config import API_KEY, SERVER_TO_PORT, PORT_TO_SERVER, HERD_CONNECTIONS, PLACES_URL
+from config import API_KEY, SERVER_TO_PORT, HERD_CONNECTIONS, PLACES_URL
 import asyncio
 
 

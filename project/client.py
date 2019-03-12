@@ -7,7 +7,7 @@ async def test():
 	writer.write("IAMAT kiwi.cs.ucla.edu +34.068930-118.445127 1520023934.918963997".encode())
 	writer.write_eof()
 	data = await reader.read(n=-1)
-	print('Received: {}\n'.format(data.decode()))
+	print('Received: {}'.format(data.decode()))
 	writer.close()
 
 async def get_client():
@@ -15,7 +15,7 @@ async def get_client():
 	writer.write("WHATSAT kiwi.cs.ucla.edu 10 5".encode())
 	writer.write_eof()
 	data = await reader.read(n=-1)
-	print('Received: {}\n'.format(data.decode()))
+	print('Received: {}'.format(data.decode()))
 	writer.close()
 
 async def main():

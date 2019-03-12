@@ -79,20 +79,23 @@ async def flood_client_update(msg, propagated=[]):
 				f.flush()
 
 async def handle_iamat(msg, msg_data, time_received, writer):
-	if len(msg_data) == 4 and lat_long_matcher.match(msg_data[2]) and isfloat(msg_data[3]):
+	if len(msg_data) == 4 and lat_long_matcher.match(msg_data[2]) and isfloat(msg_data[3]) and float(msg_data[3]) >= 0:
 		timediff = time_received-float(msg_data[3])
 		timediff = '+' + str(timediff) if timediff >= 0 else '-' + str(timediff)
 		client = Client(msg_data[1], msg_data[2], msg_data[3], timediff, server_name)
-		if client.id not in clients or float(msg_data[3]) > float(clients[client.id].client_time):
-			clients[client.id] = client
 		
 		response = 'AT %s %s %s %s %s' % (client.last_server_contacted, client.time_diff, client.id, client.location, client.client_time)
-		await write_log_output(response, writer)
 		
-		with open('{}.txt'.format(server_name), 'a+') as f:
-				f.write('{}: {}\n'.format('FLOODING SERVERS', response))
-				f.flush()
-		asyncio.create_task(flood_client_update(response, [server_name]))
+		if client.id not in clients or float(msg_data[3]) >= float(clients[client.id].client_time):
+			clients[client.id] = client
+			await write_log_output(response + "\n", writer)
+			
+			with open('{}.txt'.format(server_name), 'a+') as f:
+					f.write('{}: {}\n'.format('FLOODING SERVERS', response))
+					f.flush()
+			asyncio.create_task(flood_client_update(response, [server_name]))
+		else:
+			await write_log_output(response + "\n", writer)
 	else:
 		await write_unrecognized(msg, writer)
 
@@ -106,15 +109,15 @@ async def handle_at(msg, msg_data, writer):
 				f.flush()
 
 		client = Client(msg_data[3], msg_data[4], msg_data[5], msg_data[2], msg_data[1])
-		if client.id not in clients or float(msg_data[5]) > float(clients[client.id].client_time):
+		if client.id not in clients or float(msg_data[5]) >= float(clients[client.id].client_time):
 			clients[client.id] = client
 
-		propagated = msg_data[-1].split(',')
-		message = " ".join(msg_data[:-2])
-		with open('{}.txt'.format(server_name), 'a+') as f:
-				f.write('{}: {}\n'.format('FLOODING SERVERS', message))
-				f.flush()
-		asyncio.create_task(flood_client_update(message, propagated))
+			propagated = msg_data[-1].split(',')
+			message = " ".join(msg_data[:-2])
+			with open('{}.txt'.format(server_name), 'a+') as f:
+					f.write('{}: {}\n'.format('FLOODING SERVERS', message))
+					f.flush()
+			asyncio.create_task(flood_client_update(message, propagated))
 	else:
 		await write_unrecognized(msg, writer)
 
